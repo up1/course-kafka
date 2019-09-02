@@ -8,13 +8,6 @@ Monitoring Tools
 * [Prometheus](https://prometheus.io/) + [Grafana](https://grafana.com/)
 
 
-### Install [Prometheus](https://prometheus.io)
-Start Prometheus server
-```
-$./prometheus
-```
-Open url=http://localhost:9090 in browser
-
 ### Install [Prometheus JMX Exporter](https://github.com/prometheus/jmx_exporter/)
 * Download [JAR file](https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.12.0/jmx_prometheus_javaagent-0.12.0.jar)
 * Download [Kafka configuration file](https://raw.githubusercontent.com/prometheus/jmx_exporter/master/example_configs/kafka-2_0_0.yml)
@@ -22,7 +15,7 @@ Open url=http://localhost:9090 in browser
 ### Start Zookeeper with JMX exporter
 ```
 $export PATH_TO_JMX=<your path>
-$KAFKA_OPTS="-javaagent:$PATH_TO_JMX/jmx_prometheus_javaagent-0.12.0.jar=7071:$PATH_TO_JMX/kafka-2_0_0.yml" ./bin/zookeeper-server-start.sh config/zookeeper.properties
+$KAFKA_OPTS="-javaagent:$PATH_TO_JMX/jmx_prometheus_javaagent-0.12.0.jar=7071:$PATH_TO_JMX/zookeeper.yaml" ./bin/zookeeper-server-start.sh config/zookeeper.properties
 ```
 Open url=http://localhost:7071 in browser
 
@@ -51,6 +44,46 @@ $KAFKA_OPTS="-javaagent:$PATH_TO_JMX/jmx_prometheus_javaagent-0.12.0.jar=7074:$P
 
 Open url=http://localhost:7074 in browser
 
+### Install [Prometheus](https://prometheus.io)
+Edit file prometheus.yml
+```
+scrape_configs:
+  - job_name: 'zookeeper-server' 
+    static_configs: 
+    - targets: ['127.0.0.1:7071']
+
+  - job_name: 'kafka-server' 
+    static_configs: 
+    - targets: ['127.0.0.1:7072']
+
+  - job_name: 'kafka-producer' 
+    static_configs: 
+    - targets: ['127.0.0.1:7073']
+
+  - job_name: 'kafka-consumer' 
+    static_configs: 
+    - targets: ['127.0.0.1:7074']
+```
+
+Start Prometheus server
+```
+$./prometheus
+```
+Open url=http://localhost:9090 in browser
+
+### Install [Grafana](https://grafana.com/grafana/download)
+
+For MacOS
+```
+$wget https://dl.grafana.com/oss/release/grafana-6.3.5.darwin-amd64.tar.gz 
+$tar -zxvf grafana-6.3.5.darwin-amd64.tar.gz 
+$cd grafana-6.3.5
+$./bin/grafana-server
+```
+
+Open url=http://localhost:3000 in browser with
+* username=admin
+* password=admin
 
 
 
