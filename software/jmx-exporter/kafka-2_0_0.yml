@@ -1,0 +1,126 @@
+lowercaseOutputName: true
+
+rules:
+# Special cases and very specific rules
+- pattern : kafka.server<type=(.+), name=(.+), clientId=(.+), topic=(.+), partition=(.*)><>Value
+  name: kafka_server_$1_$2
+  type: GAUGE
+  labels:
+    clientId: "$3"
+    topic: "$4"
+    partition: "$5"
+- pattern : kafka.server<type=(.+), name=(.+), clientId=(.+), brokerHost=(.+), brokerPort=(.+)><>Value
+  name: kafka_server_$1_$2
+  type: GAUGE
+  labels:
+    clientId: "$3"
+    broker: "$4:$5"
+- pattern : kafka.coordinator.(\w+)<type=(.+), name=(.+)><>Value
+  name: kafka_coordinator_$1_$2_$3
+  type: GAUGE
+
+# Generic per-second counters with 0-2 key/value pairs
+- pattern: kafka.(\w+)<type=(.+), name=(.+)PerSec\w*, (.+)=(.+), (.+)=(.+)><>Count
+  name: kafka_$1_$2_$3_total
+  type: COUNTER
+  labels:
+    "$4": "$5"
+    "$6": "$7"
+- pattern: kafka.(\w+)<type=(.+), name=(.+)PerSec\w*, (.+)=(.+)><>Count
+  name: kafka_$1_$2_$3_total
+  type: COUNTER
+  labels:
+    "$4": "$5"
+- pattern: kafka.(\w+)<type=(.+), name=(.+)PerSec\w*><>Count
+  name: kafka_$1_$2_$3_total
+  type: COUNTER
+
+# Generic gauges with 0-2 key/value pairs
+- pattern: kafka.(\w+)<type=(.+), name=(.+), (.+)=(.+), (.+)=(.+)><>Value
+  name: kafka_$1_$2_$3
+  type: GAUGE
+  labels:
+    "$4": "$5"
+    "$6": "$7"
+- pattern: kafka.(\w+)<type=(.+), name=(.+), (.+)=(.+)><>Value
+  name: kafka_$1_$2_$3
+  type: GAUGE
+  labels:
+    "$4": "$5"
+- pattern: kafka.(\w+)<type=(.+), name=(.+)><>Value
+  name: kafka_$1_$2_$3
+  type: GAUGE
+
+# Emulate Prometheus 'Summary' metrics for the exported 'Histogram's.
+#
+# Note that these are missing the '_sum' metric!
+- pattern: kafka.(\w+)<type=(.+), name=(.+), (.+)=(.+), (.+)=(.+)><>Count
+  name: kafka_$1_$2_$3_count
+  type: COUNTER
+  labels:
+    "$4": "$5"
+    "$6": "$7"
+- pattern: kafka.(\w+)<type=(.+), name=(.+), (.+)=(.*), (.+)=(.+)><>(\d+)thPercentile
+  name: kafka_$1_$2_$3
+  type: GAUGE
+  labels:
+    "$4": "$5"
+    "$6": "$7"
+    quantile: "0.$8"
+- pattern: kafka.(\w+)<type=(.+), name=(.+), (.+)=(.+)><>Count
+  name: kafka_$1_$2_$3_count
+  type: COUNTER
+  labels:
+    "$4": "$5"
+- pattern: kafka.(\w+)<type=(.+), name=(.+), (.+)=(.*)><>(\d+)thPercentile
+  name: kafka_$1_$2_$3
+  type: GAUGE
+  labels:
+    "$4": "$5"
+    quantile: "0.$6"
+- pattern: kafka.(\w+)<type=(.+), name=(.+)><>Count
+  name: kafka_$1_$2_$3_count
+  type: COUNTER
+- pattern: kafka.(\w+)<type=(.+), name=(.+)><>(\d+)thPercentile
+  name: kafka_$1_$2_$3
+  type: GAUGE
+  labels:
+    quantile: "0.$4"
+
+## new
+# 
+# sample result
+# kafka_consumer_fetch_manager_metrics_bytes_consumed_total{client_id="some_client-0",topic="some_topic",} 62818.0
+# kafka_consumer_fetch_manager_metrics_records_consumed_total{client_id="some_client-0",topic="some_topic",} 137.0
+#
+- pattern: kafka.consumer<type=(.+), client-id=(.+), topic=(.+)><>(records-consumed-rate|bytes-consumed-rate|records-lag-max|fetch-rate)
+  name: kafka_$1_$4
+  labels:
+    client-id: $2
+    topic: $3
+  type: COUNTER
+
+- pattern: kafka.consumer<type=(.+), client-id=(.+)><>(fetch-rate|fetch-latency-avg|fetch-latency-max|fetch-throttle-time-avg|fetch-throttle-time-max|connection-count|connection-creation-rate)
+  name: kafka_$1_$3
+  labels:
+    client-id: $2
+  type: COUNTER
+
+
+- pattern: kafka.consumer<type=(.+), client-id=(.+)><>( )
+  name: kafka_$1_$3
+  labels:
+    client-id: $2
+
+- pattern: kafka.producer<type=(.+), client-id=(.+), topic=(.+)><>(request-rate|response-rate)
+  name: kafka_$1_$4
+  labels:
+    client-id: $2
+    topic: $3
+  type: COUNTER
+
+- pattern: kafka.producer<type=(.+), client-id=(.+)><>(request-latency-max|request-latency-avg|request-rate|response-rate)
+  name: kafka_$1_$3
+  labels:
+    client-id: $2
+  type: COUNTER
