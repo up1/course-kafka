@@ -8,7 +8,7 @@ $docker container ps
 $docker container logs redis1
 ```
 
-Run with redis-cli
+### Run with redis-cli
 ```
 $docker container exec -it redis1 sh
 #redis-cli
@@ -17,7 +17,7 @@ $docker container exec -it redis1 sh
 PONG
 ```
 
-Basic command with redis
+### Basic command with redis
 ```
 >set name somkiat
 >get name
@@ -31,7 +31,7 @@ Redis performacne testing
 #redis-benchmark -t get -n 10000
 ```
 
-Redis monitoring command
+### Redis monitoring command
 ```
 >MONITORING
 >INFO
@@ -39,9 +39,39 @@ Redis monitoring command
 >INFO stats
 ```
 
-Redis monitoring with Prometheus
-```
-```
-
-
 More for [Redis command](https://redis.io/commands)
+
+### Redis monitoring with Prometheus
+Download files
+* [Redis exporter](https://github.com/oliver006/redis_exporter/releases)
+* [Redis dashboard for Prometheus](https://grafana.com/grafana/dashboards/763)
+
+Run redis exporter
+```
+$redis_exporter -redis.addr redis://localhost:6379
+```
+Open url=http://localhost:9121/metrics in browser
+
+Edit file prometheus.yml
+```
+scrape_configs:
+  - job_name: 'zookeeper-server' 
+    static_configs: 
+    - targets: ['127.0.0.1:7071']
+
+  - job_name: 'kafka-server' 
+    static_configs: 
+    - targets: ['127.0.0.1:7072']
+
+  - job_name: 'kafka-producer' 
+    static_configs: 
+    - targets: ['127.0.0.1:7073']
+
+  - job_name: 'kafka-consumer' 
+    static_configs: 
+    - targets: ['127.0.0.1:7074']
+```
+
+
+### Reference Websites
+* [Redis on windows](https://redislabs.com/blog/redis-on-windows-8-1-and-previous-versions/)
