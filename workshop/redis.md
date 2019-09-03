@@ -55,23 +55,10 @@ Open url=http://localhost:9121/metrics in browser
 Edit file prometheus.yml
 ```
 scrape_configs:
-  - job_name: 'zookeeper-server' 
+  - job_name: 'redis-server' 
     static_configs: 
-    - targets: ['127.0.0.1:7071']
-
-  - job_name: 'kafka-server' 
-    static_configs: 
-    - targets: ['127.0.0.1:7072']
-
-  - job_name: 'kafka-producer' 
-    static_configs: 
-    - targets: ['127.0.0.1:7073']
-
-  - job_name: 'kafka-consumer' 
-    static_configs: 
-    - targets: ['127.0.0.1:7074']
+    - targets: ['127.0.0.1:9121']
 ```
-
 
 ### Reference Websites
 * [Redis on windows](https://redislabs.com/blog/redis-on-windows-8-1-and-previous-versions/)
