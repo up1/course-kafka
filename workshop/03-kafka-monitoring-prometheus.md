@@ -34,6 +34,13 @@ $export PATH_TO_JMX=<your path>
 $KAFKA_OPTS="-javaagent:$PATH_TO_JMX/jmx_prometheus_javaagent-0.12.0.jar=7073:$PATH_TO_JMX/kafka-2_0_0.yml" bin/kafka-console-producer.sh --broker-list localhost:9092 --topic demo01
 ```
 
+For Windows
+```
+$set PATH_TO_JMX=<your path>
+$set KAFKA_OPTS=-javaagent:%PATH_TO_JMX%\jmx_prometheus_javaagent-0.12.0.jar=7073:%PATH_TO_JMX%\kafka-2_0_0.yml
+$bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic test
+```
+
 Open url=http://localhost:7073 in browser
 
 ### Start Consumer with JMX exporter
