@@ -4,6 +4,7 @@ Create redis container
 ```
 $docker image pull redis:5.0.5
 $docker container run -d -p 6379:6379 --name redis1 redis:5.0.5
+$docker container run -d -p 6379:6379 --name redis1 redis:5.0.5 --maxmemory 1gb
 $docker container ps
 $docker container logs redis1
 ```
